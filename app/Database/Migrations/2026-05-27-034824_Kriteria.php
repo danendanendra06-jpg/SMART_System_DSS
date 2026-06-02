@@ -19,14 +19,15 @@ class Kriteria extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
             ],
-            'bobot' => [
-                'type'       => 'FLOAT',
-            ],
             'jenis' => [
                 'type'       => 'ENUM',
                 'constraint' => ['Benefit', 'Cost'],
                 'default'    => 'Benefit',
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ]
         ]);
         $this->forge->addKey('id_kriteria', true);
         $this->forge->createTable('kriteria');

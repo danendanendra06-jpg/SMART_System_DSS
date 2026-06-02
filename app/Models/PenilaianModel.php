@@ -11,6 +11,6 @@ class PenilaianModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $allowedFields    = [
-        'nama_responden', 'id_alternatif'
+        'id_user', 'id_alternatif'
     ];
 }

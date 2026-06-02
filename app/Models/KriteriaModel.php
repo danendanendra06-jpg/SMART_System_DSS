@@ -10,5 +10,5 @@ class KriteriaModel extends Model
     protected $primaryKey       = 'id_kriteria';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = ['nama_kriteria', 'bobot', 'jenis'];
+    protected $allowedFields    = ['nama_kriteria', 'jenis'];
 }

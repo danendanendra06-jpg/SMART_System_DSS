@@ -15,6 +15,11 @@ class Hasil extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
+            'id_user' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
             'id_alternatif' => [
                 'type'       => 'INT',
                 'constraint' => 11,
@@ -29,8 +34,7 @@ class Hasil extends Migration
             ],
         ]);
         $this->forge->addKey('id_hasil', true);
-        
-        // Foreign keys
+        $this->forge->addForeignKey('id_user', 'users', 'id_user', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('id_alternatif', 'alternatif', 'id_alternatif', 'CASCADE', 'CASCADE');
         
         $this->forge->createTable('hasil');

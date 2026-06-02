@@ -1,68 +1,66 @@
 <?= $this->extend('layout/main') ?>
 
 <?= $this->section('content') ?>
-<div class="mb-4">
-    <h3 class="fw-bold"><i class="fas fa-chart-line me-2 text-primary"></i> 5. Nilai Utility</h3>
-    <p class="text-muted">Hasil perhitungan nilai utility berdasarkan kriteria (Benefit / Cost) untuk setiap alternatif.</p>
-</div>
-
-<!-- Informasi Cmax dan Cmin -->
-<div class="card card-custom mb-4 bg-light border-0">
-    <div class="card-body">
-        <h5 class="fw-bold text-secondary mb-3"><i class="fas fa-info-circle me-2"></i> Nilai Maximum (Cmax) & Minimum (Cmin) per Kriteria</h5>
-        <div class="row">
-            <?php foreach($kriteria as $k): 
-                $id_k = $k['id_kriteria'];
-            ?>
-            <div class="col-md-4 col-sm-6 mb-3">
-                <div class="p-3 border rounded bg-white shadow-sm">
-                    <span class="d-block fw-bold text-primary mb-1"><?= esc($k['nama_kriteria']) ?> <span class="badge bg-secondary ms-1"><?= esc($k['jenis']) ?></span></span>
-                    <div class="d-flex justify-content-between text-muted small">
-                        <span>Cmax: <strong class="text-dark"><?= number_format($cMax[$id_k], 2) ?></strong></span>
-                        <span>Cmin: <strong class="text-dark"><?= number_format($cMin[$id_k], 2) ?></strong></span>
-                    </div>
-                </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-0">4. Nilai Utility</h4>
+        <?php if(session()->get('role') == 'admin'): ?>
+            <div class="mt-2 d-flex align-items-center bg-light p-2 rounded border">
+                <label class="me-2 fw-bold text-muted small"><i class="fas fa-filter me-1"></i> Mode Monitoring:</label>
+                <form method="GET" action="<?= current_url() ?>" class="m-0 p-0">
+                    <select name="u" class="form-select form-select-sm w-auto d-inline-block fw-bold text-primary" onchange="this.form.submit()">
+                        <option value="global" <?= $activeUser == 'global' ? 'selected' : '' ?>>Semua User (Agregasi Global)</option>
+                        <optgroup label="Spesifik User">
+                        <?php foreach($allUsers as $usr): ?>
+                            <option value="<?= $usr['id_user'] ?>" <?= $activeUser == $usr['id_user'] ? 'selected' : '' ?>><?= esc($usr['nama']) ?></option>
+                        <?php endforeach; ?>
+                        </optgroup>
+                    </select>
+                </form>
             </div>
-            <?php endforeach; ?>
-        </div>
+        <?php else: ?>
+            <span class="badge bg-info text-dark mt-2"><i class="fas fa-user me-1"></i> Data Anda Sendiri</span>
+        <?php endif; ?>
     </div>
 </div>
 
-<div class="card card-custom">
+<div class="card border-0 shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-hover align-middle table-bordered text-center">
                 <thead class="table-light">
                     <tr>
                         <th rowspan="2" class="align-middle" width="5%">No</th>
-                        <th rowspan="2" class="align-middle text-start">Alternatif (Tempat Makan)</th>
-                        <th colspan="<?= count($kriteria) ?>">Nilai Utility Kriteria</th>
+                        <th rowspan="2" class="align-middle text-start">Alternatif</th>
+                        <th colspan="<?= count($kriteria) ?>">Nilai Utility Berdasarkan Jenis</th>
                     </tr>
                     <tr>
                         <?php foreach($kriteria as $k): ?>
-                            <th><?= esc($k['nama_kriteria']) ?></th>
+                            <th><small><?= esc($k['nama_kriteria']) ?> (<?= $k['jenis'] ?>)<br>
+                            Max: <?= $cMax[$k['id_kriteria']] ?> | Min: <?= $cMin[$k['id_kriteria']] ?></small></th>
                         <?php endforeach; ?>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $i = 1; foreach ($alternatif as $a) : ?>
+                    <?php if(isset($utility[$a['id_alternatif']])): ?>
                     <tr>
                         <td><?= $i++ ?></td>
-                        <td class="text-start fw-bold text-primary"><?= esc($a['nama_alternatif']) ?></td>
-                        <?php foreach($kriteria as $k): 
-                            $u = $utility[$a['id_alternatif']][$k['id_kriteria']] ?? 0;
-                        ?>
-                            <td><?= number_format($u, 4) ?></td>
+                        <td class="text-start text-primary fw-bold"><?= esc($a['nama_alternatif']) ?></td>
+                        <?php foreach($kriteria as $k): ?>
+                            <td><?= number_format($utility[$a['id_alternatif']][$k['id_kriteria']], 4) ?></td>
                         <?php endforeach; ?>
                     </tr>
+                    <?php endif; ?>
                     <?php endforeach; ?>
+
+                    <?php if($i == 1): ?>
+                    <tr>
+                        <td colspan="<?= 2 + count($kriteria) ?>" class="text-center py-4 text-muted">Belum ada data.</td>
+                    </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
-        </div>
-        
-        <div class="d-flex justify-content-between mt-4">
-            <a href="<?= base_url('smart/normalisasi') ?>" class="btn btn-secondary btn-custom"><i class="fas fa-arrow-left me-2"></i> Sebelumnya</a>
-            <a href="<?= base_url('smart/nilai-akhir') ?>" class="btn btn-primary btn-custom">Selanjutnya: Nilai Akhir <i class="fas fa-arrow-right ms-2"></i></a>
         </div>
     </div>
 </div>

@@ -25,18 +25,19 @@ class Penilaian extends BaseController
     public function index()
     {
         $db = \Config\Database::connect();
-        
-        // Ambil data penilaian beserta alternatifnya
-        $penilaian = $db->table('penilaian')
-                        ->select('penilaian.*, alternatif.nama_alternatif')
-                        ->join('alternatif', 'alternatif.id_alternatif = penilaian.id_alternatif')
-                        ->orderBy('penilaian.id_penilaian', 'DESC')
-                        ->get()->getResultArray();
+        $builder = $db->table('penilaian')
+                      ->select('penilaian.*, alternatif.nama_alternatif, users.nama as nama_user')
+                      ->join('alternatif', 'alternatif.id_alternatif = penilaian.id_alternatif')
+                      ->join('users', 'users.id_user = penilaian.id_user')
+                      ->orderBy('penilaian.id_penilaian', 'DESC');
 
-        // Karena data nilai dinamis, kita kirimkan data mentah kriteria untuk membuat header tabel
+        if (session()->get('role') != 'admin') {
+            $builder->where('penilaian.id_user', session()->get('id_user'));
+        }
+
+        $penilaian = $builder->get()->getResultArray();
         $kriteria = $this->kriteriaModel->findAll();
 
-        // Kita perlu menyusun matriks nilai untuk ditampilkan di tabel index
         $nilaiMatrix = [];
         $details = $this->detailPenilaianModel->findAll();
         foreach($details as $d) {
@@ -44,7 +45,7 @@ class Penilaian extends BaseController
         }
 
         $data = [
-            'title'      => 'Data Penilaian | SPK SMART',
+            'title'      => session()->get('role') == 'admin' ? 'Data Penilaian Global | SPK SMART' : 'Data Penilaian Saya | SPK SMART',
             'penilaian'  => $penilaian,
             'kriteria'   => $kriteria,
             'nilaiMatrix'=> $nilaiMatrix
@@ -54,10 +55,26 @@ class Penilaian extends BaseController
 
     public function create()
     {
+        if (session()->get('role') == 'admin') {
+            return redirect()->to(base_url('penilaian'))->with('error', 'Admin tidak dapat menginput penilaian.');
+        }
+
+        // Cari alternatif yang belum dinilai oleh user ini
+        $db = \Config\Database::connect();
+        $id_user = session()->get('id_user');
+        $dinilaiQuery = $db->table('penilaian')->select('id_alternatif')->where('id_user', $id_user)->get()->getResultArray();
+        $dinilaiIds = array_column($dinilaiQuery, 'id_alternatif');
+
+        if (empty($dinilaiIds)) {
+            $alternatif = $this->alternatifModel->findAll();
+        } else {
+            $alternatif = $this->alternatifModel->whereNotIn('id_alternatif', $dinilaiIds)->findAll();
+        }
+
         $data = [
-            'title'      => 'Input Penilaian Baru | SPK SMART',
+            'title'      => 'Beri Penilaian Tempat Makan | SPK SMART',
             'validation' => \Config\Services::validation(),
-            'alternatif' => $this->alternatifModel->findAll(),
+            'alternatif' => $alternatif,
             'kriteria'   => $this->kriteriaModel->findAll()
         ];
         return view('penilaian/create', $data);
@@ -65,34 +82,35 @@ class Penilaian extends BaseController
 
     public function store()
     {
-        $nama_responden = $this->request->getPost('nama_responden');
-        $id_alternatif = $this->request->getPost('id_alternatif');
-        $nilai = $this->request->getPost('nilai'); // Ini berupa array [id_kriteria => nilai]
+        if (session()->get('role') == 'admin') {
+            return redirect()->to(base_url('penilaian'))->with('error', 'Akses ditolak.');
+        }
 
-        // Validasi dasar
-        if(empty($nama_responden) || empty($id_alternatif)) {
-            session()->setFlashdata('error', 'Nama Responden dan Alternatif harus diisi.');
+        $id_alternatif = $this->request->getPost('id_alternatif');
+        $nilai = $this->request->getPost('nilai'); // array [id_kriteria => nilai]
+        $id_user = session()->get('id_user');
+
+        if(empty($id_alternatif)) {
+            session()->setFlashdata('error', 'Alternatif harus dipilih.');
             return redirect()->to(base_url('penilaian/create'))->withInput();
         }
 
-        // Cek duplikasi
-        $cek = $this->penilaianModel->where('nama_responden', $nama_responden)
+        // Cek duplikasi penilaian oleh user untuk alternatif ini
+        $cek = $this->penilaianModel->where('id_user', $id_user)
                                     ->where('id_alternatif', $id_alternatif)
                                     ->first();
         if ($cek) {
-            session()->setFlashdata('error', "Responden {$nama_responden} sudah memberikan penilaian untuk tempat makan tersebut.");
+            session()->setFlashdata('error', "Anda sudah memberikan penilaian untuk tempat makan ini.");
             return redirect()->to(base_url('penilaian/create'))->withInput();
         }
 
-        // Insert ke tabel penilaian
         $this->penilaianModel->insert([
-            'nama_responden' => $nama_responden,
+            'id_user'        => $id_user,
             'id_alternatif'  => $id_alternatif
         ]);
         
         $id_penilaian = $this->penilaianModel->getInsertID();
 
-        // Insert ke tabel detail_penilaian
         $detailData = [];
         if($nilai && is_array($nilai)) {
             foreach($nilai as $id_kriteria => $val) {
@@ -110,7 +128,7 @@ class Penilaian extends BaseController
             $this->detailPenilaianModel->insertBatch($detailData);
         }
 
-        session()->setFlashdata('success', 'Data Penilaian berhasil disimpan.');
+        session()->setFlashdata('success', 'Penilaian berhasil disimpan.');
         return redirect()->to(base_url('penilaian'));
     }
 
@@ -121,7 +139,11 @@ class Penilaian extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        // Ambil detail nilai
+        if (session()->get('role') != 'admin' && $penilaian['id_user'] != session()->get('id_user')) {
+            session()->setFlashdata('error', 'Anda tidak berhak mengedit penilaian ini.');
+            return redirect()->to(base_url('penilaian'));
+        }
+
         $details = $this->detailPenilaianModel->where('id_penilaian', $id)->findAll();
         $nilaiSelesai = [];
         foreach($details as $d) {
@@ -141,33 +163,33 @@ class Penilaian extends BaseController
 
     public function update($id)
     {
-        $nama_responden = $this->request->getPost('nama_responden');
+        $penilaian = $this->penilaianModel->find($id);
+        if (session()->get('role') != 'admin' && $penilaian['id_user'] != session()->get('id_user')) {
+            return redirect()->to(base_url('penilaian'));
+        }
+
         $id_alternatif = $this->request->getPost('id_alternatif');
         $nilai = $this->request->getPost('nilai');
 
-        // Validasi dasar
-        if(empty($nama_responden) || empty($id_alternatif)) {
-            session()->setFlashdata('error', 'Nama Responden dan Alternatif harus diisi.');
+        if(empty($id_alternatif)) {
+            session()->setFlashdata('error', 'Alternatif harus diisi.');
             return redirect()->to(base_url('penilaian/edit/'.$id))->withInput();
         }
 
-        // Cek duplikasi jika mengubah responden atau alternatif
-        $cek = $this->penilaianModel->where('nama_responden', $nama_responden)
+        // Cek duplikasi jika user mengubah alternatif ke alternatif yang sudah dinilainya
+        $cek = $this->penilaianModel->where('id_user', $penilaian['id_user'])
                                     ->where('id_alternatif', $id_alternatif)
                                     ->where('id_penilaian !=', $id)
                                     ->first();
         if ($cek) {
-            session()->setFlashdata('error', 'Responden ini sudah memberikan penilaian untuk alternatif tersebut.');
+            session()->setFlashdata('error', 'Anda sudah memberikan penilaian untuk alternatif tersebut.');
             return redirect()->to(base_url('penilaian/edit/' . $id))->withInput();
         }
 
-        // Update penilaian utama
         $this->penilaianModel->update($id, [
-            'nama_responden' => $nama_responden,
             'id_alternatif'  => $id_alternatif
         ]);
 
-        // Karena dinamis, cara termudah update adalah hapus semua detail lama lalu insert baru
         $this->detailPenilaianModel->where('id_penilaian', $id)->delete();
 
         $detailData = [];
@@ -187,13 +209,17 @@ class Penilaian extends BaseController
             $this->detailPenilaianModel->insertBatch($detailData);
         }
 
-        session()->setFlashdata('success', 'Data Penilaian berhasil diubah.');
+        session()->setFlashdata('success', 'Penilaian berhasil diubah.');
         return redirect()->to(base_url('penilaian'));
     }
 
     public function delete($id)
     {
-        // Karena ada CASCADE di DB, menghapus tabel penilaian otomatis hapus detail_penilaian
+        $penilaian = $this->penilaianModel->find($id);
+        if (session()->get('role') != 'admin' && $penilaian['id_user'] != session()->get('id_user')) {
+            return redirect()->to(base_url('penilaian'));
+        }
+
         $this->penilaianModel->delete($id);
         session()->setFlashdata('success', 'Data Penilaian berhasil dihapus.');
         return redirect()->to(base_url('penilaian'));

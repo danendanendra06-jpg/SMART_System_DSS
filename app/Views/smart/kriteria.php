@@ -2,8 +2,8 @@
 
 <?= $this->section('content') ?>
 <div class="mb-4">
-    <h3 class="fw-bold"><i class="fas fa-list me-2 text-primary"></i> 1. Kriteria & Bobot</h3>
-    <p class="text-muted">Daftar kriteria yang digunakan dalam pemilihan tempat makan beserta bobot dan jenisnya.</p>
+    <h3 class="fw-bold"><i class="fas fa-list me-2 text-primary"></i> 1. Kriteria Master</h3>
+    <p class="text-muted">Daftar kriteria yang digunakan dalam pemilihan tempat makan. (Bobot ditentukan secara spesifik oleh masing-masing user pada menu Atur Bobot).</p>
 </div>
 
 <div class="card card-custom">
@@ -15,17 +15,15 @@
                         <th width="5%">No</th>
                         <th>Kode</th>
                         <th class="text-start">Nama Kriteria</th>
-                        <th>Bobot (%)</th>
                         <th>Jenis Kriteria</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $i = 1; $total = 0; foreach ($kriteria as $k) : ?>
+                    <?php $i = 1; foreach ($kriteria as $k) : ?>
                     <tr>
                         <td><?= $i ?></td>
                         <td>C<?= $i ?></td>
                         <td class="text-start fw-bold"><?= esc($k['nama_kriteria']) ?></td>
-                        <td><?= esc($k['bobot']) ?></td>
                         <td>
                             <?php if($k['jenis'] == 'Benefit'): ?>
                                 <span class="badge bg-success"><i class="fas fa-plus-circle me-1"></i> Benefit</span>
@@ -35,18 +33,10 @@
                         </td>
                     </tr>
                     <?php 
-                        $total += $k['bobot'];
                         $i++; 
                     endforeach; 
                     ?>
                 </tbody>
-                <tfoot class="table-secondary fw-bold">
-                    <tr>
-                        <td colspan="3" class="text-end">Total Bobot</td>
-                        <td><?= $total ?></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
             </table>
         </div>
         

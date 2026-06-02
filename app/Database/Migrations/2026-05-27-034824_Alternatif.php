@@ -24,8 +24,19 @@ class Alternatif extends Migration
                 'constraint' => '255',
                 'null'       => true,
             ],
+            'created_by' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+                'null'       => true, // Can be null if seeded by admin globally
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
         ]);
         $this->forge->addKey('id_alternatif', true);
+        $this->forge->addForeignKey('created_by', 'users', 'id_user', 'CASCADE', 'CASCADE');
         $this->forge->createTable('alternatif');
     }
 

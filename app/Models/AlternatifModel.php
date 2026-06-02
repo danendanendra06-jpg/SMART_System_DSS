@@ -10,5 +10,5 @@ class AlternatifModel extends Model
     protected $primaryKey       = 'id_alternatif';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = ['nama_alternatif', 'lokasi'];
+    protected $allowedFields    = ['nama_alternatif', 'lokasi', 'created_by'];
 }

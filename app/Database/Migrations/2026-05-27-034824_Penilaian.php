@@ -15,17 +15,23 @@ class Penilaian extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'nama_responden' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 100,
+            'id_user' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
             ],
             'id_alternatif' => [
                 'type'       => 'INT',
                 'constraint' => 11,
                 'unsigned'   => true,
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
         ]);
         $this->forge->addKey('id_penilaian', true);
+        $this->forge->addForeignKey('id_user', 'users', 'id_user', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('id_alternatif', 'alternatif', 'id_alternatif', 'CASCADE', 'CASCADE');
         
         $this->forge->createTable('penilaian');

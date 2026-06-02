@@ -10,5 +10,5 @@ class HasilModel extends Model
     protected $primaryKey       = 'id_hasil';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = ['id_alternatif', 'nilai_akhir', 'ranking'];
+    protected $allowedFields    = ['id_user', 'id_alternatif', 'nilai_akhir', 'ranking'];
 }

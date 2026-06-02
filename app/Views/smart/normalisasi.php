@@ -1,56 +1,55 @@
 <?= $this->extend('layout/main') ?>
 
 <?= $this->section('content') ?>
-<div class="mb-4">
-    <h3 class="fw-bold"><i class="fas fa-percent me-2 text-primary"></i> 4. Normalisasi Bobot Kriteria</h3>
-    <p class="text-muted">Proses pembobotan ulang agar total bobot menjadi 1 (atau 100%).</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-0">3. Normalisasi Bobot Preferensi</h4>
+        <?php if(session()->get('role') == 'admin'): ?>
+            <div class="mt-2 d-flex align-items-center bg-light p-2 rounded border">
+                <label class="me-2 fw-bold text-muted small"><i class="fas fa-filter me-1"></i> Mode Monitoring:</label>
+                <form method="GET" action="<?= current_url() ?>" class="m-0 p-0">
+                    <select name="u" class="form-select form-select-sm w-auto d-inline-block fw-bold text-primary" onchange="this.form.submit()">
+                        <option value="global" <?= $activeUser == 'global' ? 'selected' : '' ?>>Semua User (Agregasi Global)</option>
+                        <optgroup label="Spesifik User">
+                        <?php foreach($allUsers as $usr): ?>
+                            <option value="<?= $usr['id_user'] ?>" <?= $activeUser == $usr['id_user'] ? 'selected' : '' ?>><?= esc($usr['nama']) ?></option>
+                        <?php endforeach; ?>
+                        </optgroup>
+                    </select>
+                </form>
+            </div>
+        <?php else: ?>
+            <span class="badge bg-info text-dark mt-2"><i class="fas fa-user me-1"></i> Data Anda Sendiri</span>
+        <?php endif; ?>
+    </div>
 </div>
 
-<div class="card card-custom">
+<div class="card border-0 shadow-sm">
     <div class="card-body">
+        <div class="alert alert-info border-0 mb-4">
+            <i class="fas fa-info-circle me-2"></i> <strong>Total Bobot:</strong> <?= $totalBobot ?>
+        </div>
         <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle text-center">
+            <table class="table table-hover align-middle table-bordered text-center">
                 <thead class="table-light">
                     <tr>
-                        <th width="5%">No</th>
-                        <th>Kode Kriteria</th>
+                        <th width="10%">No</th>
                         <th class="text-start">Nama Kriteria</th>
-                        <th>Bobot Awal (Wj)</th>
-                        <th>Bobot Normalisasi (Wj / Total)</th>
+                        <th>Bobot Mentah (User)</th>
+                        <th>Normalisasi (Bobot/Total)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php 
-                        $i = 1; 
-                        $totalNorm = 0;
-                        foreach ($normalisasi as $n) : 
-                            $totalNorm += $n['normalisasi'];
-                    ?>
+                    <?php $i = 1; foreach ($normalisasi as $n) : ?>
                     <tr>
-                        <td><?= $i ?></td>
-                        <td>C<?= $i ?></td>
+                        <td><?= $i++ ?></td>
                         <td class="text-start fw-bold"><?= esc($n['nama_kriteria']) ?></td>
-                        <td><?= esc($n['bobot']) ?></td>
-                        <td class="text-primary fw-bold"><?= number_format($n['normalisasi'], 4) ?></td>
+                        <td><?= $n['bobot'] ?></td>
+                        <td class="text-success fw-bold"><?= number_format($n['normalisasi'], 4) ?></td>
                     </tr>
-                    <?php 
-                        $i++; 
-                    endforeach; 
-                    ?>
+                    <?php endforeach; ?>
                 </tbody>
-                <tfoot class="table-secondary fw-bold">
-                    <tr>
-                        <td colspan="3" class="text-end">Total</td>
-                        <td><?= $totalBobot ?></td>
-                        <td class="text-primary"><?= number_format($totalNorm, 4) ?></td>
-                    </tr>
-                </tfoot>
             </table>
-        </div>
-        
-        <div class="d-flex justify-content-between mt-4">
-            <a href="<?= base_url('smart/rata_rata') ?>" class="btn btn-secondary btn-custom"><i class="fas fa-arrow-left me-2"></i> Sebelumnya</a>
-            <a href="<?= base_url('smart/utility') ?>" class="btn btn-primary btn-custom">Selanjutnya: Nilai Utility <i class="fas fa-arrow-right ms-2"></i></a>
         </div>
     </div>
 </div>
