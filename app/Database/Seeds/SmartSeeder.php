@@ -42,12 +42,12 @@ class SmartSeeder extends Seeder
 
         // 3. User Bobot Kriteria (Default untuk User 2, skala 1-5)
         $bobotData = [
-            ['id_user' => 2, 'id_kriteria' => 1, 'bobot' => 5], // Sangat Penting (Harga)
-            ['id_user' => 2, 'id_kriteria' => 2, 'bobot' => 4], // Penting (Porsi)
-            ['id_user' => 2, 'id_kriteria' => 3, 'bobot' => 5], // Sangat Penting (Rasa)
-            ['id_user' => 2, 'id_kriteria' => 4, 'bobot' => 3], // Cukup (Kebersihan)
-            ['id_user' => 2, 'id_kriteria' => 5, 'bobot' => 3], // Cukup (Variasi)
-            ['id_user' => 2, 'id_kriteria' => 6, 'bobot' => 4], // Penting (Pelayanan)
+            ['id_user' => 2, 'id_kriteria' => 1, 'nilai_kepentingan' => 5], // Harga -> Sangat Penting
+            ['id_user' => 2, 'id_kriteria' => 2, 'nilai_kepentingan' => 4], // Porsi -> Penting
+            ['id_user' => 2, 'id_kriteria' => 3, 'nilai_kepentingan' => 5], // Rasa -> Sangat Penting
+            ['id_user' => 2, 'id_kriteria' => 4, 'nilai_kepentingan' => 4], // Kebersihan -> Penting
+            ['id_user' => 2, 'id_kriteria' => 5, 'nilai_kepentingan' => 3], // Jarak -> Cukup
+            ['id_user' => 2, 'id_kriteria' => 6, 'nilai_kepentingan' => 3], // Fasilitas -> Cukup(Pelayanan)
         ];
         $this->db->table('user_bobot_kriteria')->insertBatch($bobotData);
 

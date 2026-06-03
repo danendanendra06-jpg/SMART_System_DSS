@@ -29,7 +29,7 @@ class UserBobot extends BaseController
         $userBobot = $this->userBobotModel->where('id_user', $id_user)->findAll();
         $bobotMap = [];
         foreach($userBobot as $ub) {
-            $bobotMap[$ub['id_kriteria']] = $ub['bobot'];
+            $bobotMap[$ub['id_kriteria']] = $ub['nilai_kepentingan'];
         }
 
         $data = [
@@ -48,24 +48,19 @@ class UserBobot extends BaseController
 
         $this->userBobotModel->where('id_user', $id_user)->delete();
 
-        $insertData = [];
         $total = 0;
-        foreach($bobot as $id_k => $b) {
-            $insertData[] = [
+        foreach($bobot as $id_kriteria => $nilai) {
+            $this->userBobotModel->insert([
                 'id_user' => $id_user,
-                'id_kriteria' => $id_k,
-                'bobot' => $b
-            ];
-            $total += $b;
+                'id_kriteria' => $id_kriteria,
+                'nilai_kepentingan' => $nilai
+            ]);
+            $total += $nilai;
         }
 
         // if($total != 100) {
         //   Warning bisa ditambahkan disini
         // }
-
-        if(!empty($insertData)){
-            $this->userBobotModel->insertBatch($insertData);
-        }
 
         session()->setFlashdata('success', 'Preferensi bobot Anda berhasil disimpan. Anda dapat melanjutkan ke perhitungan SMART.');
         return redirect()->to(base_url('userbobot'));

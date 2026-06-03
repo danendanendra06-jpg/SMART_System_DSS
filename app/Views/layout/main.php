@@ -95,9 +95,6 @@
             <a href="<?= base_url('smart/kriteria') ?>" class="<?= strpos(current_url(), 'smart/kriteria') !== false ? 'active' : '' ?>">
                 <i class="fas fa-list me-2"></i> Data Kriteria
             </a>
-            <a href="<?= base_url('alternatif') ?>" class="<?= strpos(current_url(), 'alternatif') !== false ? 'active' : '' ?>">
-                <i class="fas fa-store me-2"></i> Data Alternatif
-            </a>
             <a href="<?= base_url('penilaian') ?>" class="<?= strpos(current_url(), 'penilaian') !== false && strpos(current_url(), 'smart/penilaian') === false ? 'active' : '' ?>">
                 <i class="fas fa-clipboard-check me-2"></i> Penilaian Global
             </a>
@@ -105,27 +102,37 @@
 
         <?php if ($role == 'user'): ?>
             <div class="sidebar-heading">Decision Maker</div>
-            <a href="<?= base_url('userbobot') ?>" class="<?= strpos(current_url(), 'userbobot') !== false ? 'active' : '' ?>">
-                <i class="fas fa-sliders-h me-2"></i> Atur Bobot Preferensi
+            <a href="<?= base_url('alternatif') ?>" class="<?= strpos(current_url(), 'alternatif') !== false ? 'active' : '' ?>">
+                <i class="fas fa-store me-2"></i> Kelola Alternatif
             </a>
-            <a href="<?= base_url('smart/penilaian') ?>" class="<?= strpos(current_url(), 'smart/penilaian') !== false ? 'active' : '' ?>">
-                <i class="fas fa-search me-2"></i> Lihat Data Penilaian
+            <a href="<?= base_url('penilaian') ?>" class="<?= strpos(current_url(), 'penilaian') !== false ? 'active' : '' ?>">
+                <i class="fas fa-edit me-2"></i> Isi Penilaian
+            </a>
+            <a href="<?= base_url('userbobot') ?>" class="<?= strpos(current_url(), 'userbobot') !== false ? 'active' : '' ?>">
+                <i class="fas fa-sliders-h me-2"></i> Atur Tingkat Kepentingan
             </a>
         <?php endif; ?>
         
-        <div class="sidebar-heading">Proses SMART</div>
-        <a href="<?= base_url('smart/rata-rata') ?>" class="<?= strpos(current_url(), 'smart/rata-rata') !== false ? 'active' : '' ?>">
-            <i class="fas fa-calculator me-2"></i> Rata-rata Penilaian
-        </a>
-        <a href="<?= base_url('smart/normalisasi') ?>" class="<?= strpos(current_url(), 'smart/normalisasi') !== false ? 'active' : '' ?>">
-            <i class="fas fa-percent me-2"></i> Normalisasi Bobot
-        </a>
-        <a href="<?= base_url('smart/utility') ?>" class="<?= strpos(current_url(), 'smart/utility') !== false ? 'active' : '' ?>">
-            <i class="fas fa-chart-line me-2"></i> Nilai Utility
-        </a>
-        <a href="<?= base_url('smart/nilai-akhir') ?>" class="<?= strpos(current_url(), 'smart/nilai-akhir') !== false ? 'active' : '' ?>">
-            <i class="fas fa-star me-2"></i> Nilai Akhir
-        </a>
+        <?php if ($role == 'admin'): ?>
+            <div class="sidebar-heading">Monitoring SMART</div>
+            <a href="<?= base_url('smart/penilaian') ?>" class="<?= strpos(current_url(), 'smart/penilaian') !== false ? 'active' : '' ?>">
+                <i class="fas fa-search me-2"></i> Data Penilaian
+            </a>
+            <a href="<?= base_url('smart/rata-rata') ?>" class="<?= strpos(current_url(), 'smart/rata-rata') !== false ? 'active' : '' ?>">
+                <i class="fas fa-calculator me-2"></i> Rata-rata Penilaian
+            </a>
+            <a href="<?= base_url('smart/normalisasi') ?>" class="<?= strpos(current_url(), 'smart/normalisasi') !== false ? 'active' : '' ?>">
+                <i class="fas fa-percent me-2"></i> Normalisasi Bobot
+            </a>
+            <a href="<?= base_url('smart/utility') ?>" class="<?= strpos(current_url(), 'smart/utility') !== false ? 'active' : '' ?>">
+                <i class="fas fa-chart-line me-2"></i> Nilai Utility
+            </a>
+            <a href="<?= base_url('smart/nilai-akhir') ?>" class="<?= strpos(current_url(), 'smart/nilai-akhir') !== false ? 'active' : '' ?>">
+                <i class="fas fa-star me-2"></i> Nilai Akhir
+            </a>
+        <?php endif; ?>
+
+        <div class="sidebar-heading">Hasil Keputusan</div>
         <a href="<?= base_url('smart/ranking') ?>" class="<?= strpos(current_url(), 'smart/ranking') !== false ? 'active' : '' ?>">
             <i class="fas fa-trophy me-2"></i> Hasil Ranking
         </a>

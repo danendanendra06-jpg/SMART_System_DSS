@@ -10,7 +10,5 @@ class UserBobotKriteriaModel extends Model
     protected $primaryKey       = 'id_bobot';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = [
-        'id_user', 'id_kriteria', 'bobot'
-    ];
+    protected $allowedFields    = ['id_user', 'id_kriteria', 'nilai_kepentingan'];
 }

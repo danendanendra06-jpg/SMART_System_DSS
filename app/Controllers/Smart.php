@@ -58,7 +58,7 @@ class Smart extends BaseController
         if ($id_user === 'global') {
             $db = \Config\Database::connect();
             $bobotQuery = $db->table('user_bobot_kriteria')
-                             ->select('id_kriteria, AVG(bobot) as avg_bobot')
+                             ->select('id_kriteria, AVG(nilai_kepentingan) as avg_bobot')
                              ->groupBy('id_kriteria')
                              ->get()->getResultArray();
             foreach ($bobotQuery as $bq) {
@@ -67,7 +67,7 @@ class Smart extends BaseController
         } else if ($id_user) {
             $userBobot = $this->userBobotModel->where('id_user', $id_user)->findAll();
             foreach($userBobot as $ub) {
-                $bobotMap[$ub['id_kriteria']] = $ub['bobot'];
+                $bobotMap[$ub['id_kriteria']] = $ub['nilai_kepentingan'];
             }
         }
 
@@ -91,6 +91,7 @@ class Smart extends BaseController
 
     public function penilaian()
     {
+        if (session()->get('role') != 'admin') return redirect()->to(base_url('home'));
         $id_user = $this->getActiveUserId();
         $db = \Config\Database::connect();
         $kriteria = $this->kriteriaModel->findAll();
@@ -158,6 +159,7 @@ class Smart extends BaseController
 
     public function rata_rata()
     {
+        if (session()->get('role') != 'admin') return redirect()->to(base_url('home'));
         $id_user = $this->getActiveUserId();
         $db = \Config\Database::connect();
         
@@ -199,6 +201,7 @@ class Smart extends BaseController
 
     public function normalisasi()
     {
+        if (session()->get('role') != 'admin') return redirect()->to(base_url('home'));
         $id_user = $this->getActiveUserId();
         $kriteria = $this->getUserBobot($id_user);
 
@@ -238,6 +241,7 @@ class Smart extends BaseController
 
     public function utility()
     {
+        if (session()->get('role') != 'admin') return redirect()->to(base_url('home'));
         $id_user = $this->getActiveUserId();
         $utilityData = $this->getUtilityData($id_user);
 
@@ -259,6 +263,7 @@ class Smart extends BaseController
 
     public function nilai_akhir()
     {
+        if (session()->get('role') != 'admin') return redirect()->to(base_url('home'));
         $id_user = $this->getActiveUserId();
         $utilityData = $this->getUtilityData($id_user);
         $utility = $utilityData['utility'];
@@ -347,68 +352,59 @@ class Smart extends BaseController
     public function ranking()
     {
         $id_user = $this->getActiveUserId();
-        $db = \Config\Database::connect();
         
-        $rankingArray = [];
-        if ($id_user === 'global') {
-            // We need to recompute everything globally since we don't save global to DB
-            $utilityData = $this->getUtilityData($id_user);
-            $utility = $utilityData['utility'];
-            $alternatif = $utilityData['alternatif'];
-            
-            $kriteria = $this->getUserBobot($id_user);
-            $totalBobot = 0;
-            foreach ($kriteria as $k) { $totalBobot += $k['bobot']; }
-            
-            $normBobot = [];
-            foreach ($kriteria as $k) {
-                $normBobot[$k['id_kriteria']] = $totalBobot > 0 ? $k['bobot'] / $totalBobot : 0;
-            }
-
-            $nilaiAkhir = [];
-            foreach ($alternatif as $a) {
-                $id_a = $a['id_alternatif'];
-                $total = 0;
-                foreach ($kriteria as $k) {
-                    $id_k = $k['id_kriteria'];
-                    $u = $utility[$id_a][$id_k] ?? 0;
-                    $w = $normBobot[$id_k];
-                    $total += ($u * $w);
-                }
-                $nilaiAkhir[$id_a] = $total;
-            }
-
-            foreach ($alternatif as $a) {
-                if(isset($nilaiAkhir[$a['id_alternatif']])) {
-                    $rankingArray[] = [
-                        'id_alternatif'   => $a['id_alternatif'],
-                        'nama_alternatif' => $a['nama_alternatif'],
-                        'lokasi'          => $a['lokasi'],
-                        'nilai_akhir'     => $nilaiAkhir[$a['id_alternatif']]
-                    ];
-                }
-            }
-
-            usort($rankingArray, function($a, $b) {
-                return $b['nilai_akhir'] <=> $a['nilai_akhir'];
-            });
-
-            $rank = 1;
-            foreach ($rankingArray as &$r) {
-                $r['ranking'] = $rank++;
-            }
-
-            $targetUser = ['nama' => 'Seluruh User (Agregasi Global)'];
-        } else {
-            $query = $db->table('hasil')
-                        ->select('hasil.*, alternatif.nama_alternatif, alternatif.lokasi')
-                        ->join('alternatif', 'alternatif.id_alternatif = hasil.id_alternatif')
-                        ->where('hasil.id_user', $id_user)
-                        ->orderBy('ranking', 'ASC')
-                        ->get();
-            $rankingArray = $query->getResultArray();
-            $targetUser = $this->userModel->find($id_user);
+        $utilityData = $this->getUtilityData($id_user);
+        $utility = $utilityData['utility'];
+        $alternatif = $utilityData['alternatif'];
+        
+        $kriteria = $this->getUserBobot($id_user);
+        $totalBobot = 0;
+        foreach ($kriteria as $k) { $totalBobot += $k['bobot']; }
+        
+        if ($totalBobot == 0 && session()->get('role') == 'user') {
+            return redirect()->to(base_url('userbobot'))->with('error', 'Silakan atur bobot Anda terlebih dahulu sebelum melihat hasil ranking.');
         }
+
+        $normBobot = [];
+        foreach ($kriteria as $k) {
+            $normBobot[$k['id_kriteria']] = $totalBobot > 0 ? $k['bobot'] / $totalBobot : 0;
+        }
+
+        $nilaiAkhir = [];
+        foreach ($alternatif as $a) {
+            $id_a = $a['id_alternatif'];
+            $total = 0;
+            foreach ($kriteria as $k) {
+                $id_k = $k['id_kriteria'];
+                $u = $utility[$id_a][$id_k] ?? 0;
+                $w = $normBobot[$id_k];
+                $total += ($u * $w);
+            }
+            $nilaiAkhir[$id_a] = $total;
+        }
+
+        $rankingArray = [];
+        foreach ($alternatif as $a) {
+            if(isset($nilaiAkhir[$a['id_alternatif']])) {
+                $rankingArray[] = [
+                    'id_alternatif'   => $a['id_alternatif'],
+                    'nama_alternatif' => $a['nama_alternatif'],
+                    'lokasi'          => $a['lokasi'],
+                    'nilai_akhir'     => $nilaiAkhir[$a['id_alternatif']]
+                ];
+            }
+        }
+
+        usort($rankingArray, function($a, $b) {
+            return $b['nilai_akhir'] <=> $a['nilai_akhir'];
+        });
+
+        $rank = 1;
+        foreach ($rankingArray as &$r) {
+            $r['ranking'] = $rank++;
+        }
+
+        $targetUser = $id_user === 'global' ? ['nama' => 'Seluruh User (Agregasi Global)'] : $this->userModel->find($id_user);
 
         $data = [
             'title'      => 'Ranking Tempat Makan | SPK SMART',

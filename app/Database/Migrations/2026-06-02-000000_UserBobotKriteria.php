@@ -25,9 +25,10 @@ class UserBobotKriteria extends Migration
                 'constraint' => 11,
                 'unsigned'   => true,
             ],
-            'bobot' => [
-                'type'       => 'FLOAT',
-                'default'    => 0,
+            'nilai_kepentingan' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'default'    => 1,
             ],
         ]);
         $this->forge->addKey('id_bobot', true);
