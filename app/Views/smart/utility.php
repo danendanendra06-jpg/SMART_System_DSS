@@ -24,6 +24,28 @@
     </div>
 </div>
 
+<div class="alert alert-info border-0 shadow-sm mb-4">
+    <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Penjelasan Tahap 4: Nilai Utility</h6>
+    <div class="row">
+        <div class="col-md-6">
+            <p class="mb-1 fw-bold text-success">Kriteria Benefit</p>
+            <span class="badge bg-success fs-6 font-monospace mb-2">Utility = (Cout - Cmin) / (Cmax - Cmin)</span>
+            <p class="small mb-2">Semakin besar nilai maka semakin baik. (Porsi, Rasa, Kebersihan, Variasi, Pelayanan)</p>
+        </div>
+        <div class="col-md-6">
+            <p class="mb-1 fw-bold text-danger">Kriteria Cost</p>
+            <span class="badge bg-danger fs-6 font-monospace mb-2">Utility = (Cmax - Cout) / (Cmax - Cmin)</span>
+            <p class="small mb-2">Semakin kecil nilai maka semakin baik. (Harga)</p>
+        </div>
+    </div>
+    <hr class="my-2 opacity-25">
+    <ul class="mb-0 small list-inline">
+        <li class="list-inline-item me-3"><strong>Cout</strong> = Nilai alternatif yang dihitung</li>
+        <li class="list-inline-item me-3"><strong>Cmin</strong> = Nilai minimum</li>
+        <li class="list-inline-item"><strong>Cmax</strong> = Nilai maksimum</li>
+    </ul>
+</div>
+
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         <div class="table-responsive">

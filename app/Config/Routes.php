@@ -58,4 +58,8 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('smart/nilai_akhir', 'Smart::nilai_akhir'); 
     $routes->get('smart/ranking', 'Smart::ranking');
 
+    // Feedback
+    $routes->post('feedback/submit', 'Feedback::submit');
+    $routes->get('feedback/admin', 'Feedback::admin');
+
 });

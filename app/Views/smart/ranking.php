@@ -24,6 +24,14 @@
     </div>
 </div>
 
+<div class="alert alert-info border-0 shadow-sm mb-4">
+    <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Penjelasan Tahap 6: Ranking Alternatif</h5>
+    <p class="mb-0">
+        Alternatif akan diurutkan berdasarkan nilai akhir SMART dari terbesar ke terkecil. 
+        Alternatif dengan nilai akhir tertinggi akan menempati peringkat pertama dan direkomendasikan sebagai pilihan terbaik sesuai preferensi pengguna.
+    </p>
+</div>
+
 <div class="row">
     <div class="col-md-8 mx-auto">
         <?php if(!empty($ranking)): ?>
@@ -81,4 +89,46 @@
         </div>
     </div>
 </div>
+
+<?php if(session()->get('role') == 'user' && !empty($ranking) && !$hasFeedback): ?>
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-0 shadow-sm border-top border-3 border-primary">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">Evaluasi Hasil Rekomendasi</h5>
+                <p>Sistem merekomendasikan: <strong class="text-primary fs-5"><?= esc($ranking[0]['nama_alternatif']) ?></strong></p>
+                <p class="mb-4">Apakah Anda setuju dengan hasil rekomendasi sistem ini?</p>
+                
+                <form action="<?= base_url('feedback/submit') ?>" method="post">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="nama_alternatif_rekomendasi" value="<?= esc($ranking[0]['nama_alternatif']) ?>">
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status_feedback" id="setuju" value="Setuju" required>
+                            <label class="form-check-label fw-bold text-success" for="setuju">
+                                <i class="fas fa-thumbs-up me-1"></i> Setuju
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status_feedback" id="tidakSetuju" value="Tidak Setuju" required>
+                            <label class="form-check-label fw-bold text-danger" for="tidakSetuju">
+                                <i class="fas fa-thumbs-down me-1"></i> Tidak Setuju
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="alasan" class="form-label text-muted small">Alasan (Opsional)</label>
+                        <textarea class="form-control form-control-sm" id="alasan" name="alasan" rows="2" placeholder="Berikan alasan mengapa Anda setuju / tidak setuju..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Kirim Evaluasi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <?= $this->endSection() ?>

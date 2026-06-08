@@ -24,6 +24,18 @@
     </div>
 </div>
 
+<div class="alert alert-info border-0 shadow-sm mb-4">
+    <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Penilaian Alternatif</h6>
+    <p class="mb-2 small">Pengguna memberikan penilaian menggunakan skala 1 sampai 5. Nilai tersebut kemudian dikonversi menjadi nilai numerik untuk proses SMART.</p>
+    <div class="row small font-monospace">
+        <div class="col-md-2">1 = Sangat Buruk (20)</div>
+        <div class="col-md-2">2 = Buruk (40)</div>
+        <div class="col-md-2">3 = Cukup (60)</div>
+        <div class="col-md-2">4 = Baik (80)</div>
+        <div class="col-md-4">5 = Sangat Baik (100)</div>
+    </div>
+</div>
+
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         <div class="table-responsive">

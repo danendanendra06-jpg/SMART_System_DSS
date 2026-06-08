@@ -12,6 +12,19 @@
             Silakan pilih seberapa penting setiap kriteria menurut Anda. Sistem otomatis akan mengonversi skala 1-5 ini menjadi bobot matematis metode SMART.
         </p>
 
+        <div class="alert alert-info border-0 shadow-sm mb-4">
+            <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Normalisasi Bobot Kriteria</h6>
+            <div class="d-flex align-items-center mb-2">
+                <span class="badge bg-primary fs-6 me-2 font-monospace">Wj = wj / Σwj</span>
+            </div>
+            <ul class="mb-2 small">
+                <li><strong>Wj</strong> = Bobot normalisasi kriteria ke-j</li>
+                <li><strong>wj</strong> = Nilai kepentingan yang Anda pilih (1-5)</li>
+                <li><strong>Σwj</strong> = Total seluruh nilai kepentingan</li>
+            </ul>
+            <p class="mb-0 small"><strong>Penjelasan:</strong> Setiap nilai kepentingan yang Anda pilih akan dibagi dengan total seluruh nilai kepentingan sehingga menghasilkan bobot normalisasi. Total seluruh bobot normalisasi harus bernilai 1.</p>
+        </div>
+
         <form action="<?= base_url('userbobot/store') ?>" method="post">
             <?= csrf_field() ?>
             <div class="table-responsive">

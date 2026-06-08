@@ -406,12 +406,22 @@ class Smart extends BaseController
 
         $targetUser = $id_user === 'global' ? ['nama' => 'Seluruh User (Agregasi Global)'] : $this->userModel->find($id_user);
 
+        $hasFeedback = false;
+        if ($id_user !== 'global' && !empty($rankingArray) && session()->get('role') == 'user') {
+            $feedbackModel = new \App\Models\FeedbackModel();
+            $exist = $feedbackModel->where('id_user', $id_user)
+                                   ->where('nama_alternatif_rekomendasi', $rankingArray[0]['nama_alternatif'])
+                                   ->first();
+            if ($exist) $hasFeedback = true;
+        }
+
         $data = [
             'title'      => 'Ranking Tempat Makan | SPK SMART',
             'ranking'    => $rankingArray,
             'targetUser' => $targetUser,
             'activeUser' => $id_user,
-            'allUsers'   => $this->getAllUsersForFilter()
+            'allUsers'   => $this->getAllUsersForFilter(),
+            'hasFeedback'=> $hasFeedback
         ];
         return view('smart/ranking', $data);
     }

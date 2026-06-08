@@ -132,6 +132,13 @@
             </a>
         <?php endif; ?>
 
+        <?php if ($role == 'admin'): ?>
+            <div class="sidebar-heading">Evaluasi Sistem</div>
+            <a href="<?= base_url('feedback/admin') ?>" class="<?= strpos(current_url(), 'feedback/admin') !== false ? 'active' : '' ?>">
+                <i class="fas fa-comments me-2"></i> Monitoring Feedback
+            </a>
+        <?php endif; ?>
+
         <div class="sidebar-heading">Hasil Keputusan</div>
         <a href="<?= base_url('smart/ranking') ?>" class="<?= strpos(current_url(), 'smart/ranking') !== false ? 'active' : '' ?>">
             <i class="fas fa-trophy me-2"></i> Hasil Ranking

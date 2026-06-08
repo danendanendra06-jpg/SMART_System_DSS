@@ -24,6 +24,19 @@
     </div>
 </div>
 
+<div class="alert alert-info border-0 shadow-sm mb-4">
+    <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Penjelasan Tahap 5: Nilai Akhir SMART</h6>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge bg-primary fs-6 me-2 font-monospace">U(ai) = Σ(Wj × Uij)</span>
+    </div>
+    <ul class="mb-2 small">
+        <li><strong>U(ai)</strong> = Nilai akhir alternatif</li>
+        <li><strong>Wj</strong> = Bobot normalisasi</li>
+        <li><strong>Uij</strong> = Nilai utility</li>
+    </ul>
+    <p class="mb-0 small"><strong>Penjelasan:</strong> Nilai akhir diperoleh dari penjumlahan hasil perkalian bobot normalisasi dengan nilai utility pada setiap kriteria.</p>
+</div>
+
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
