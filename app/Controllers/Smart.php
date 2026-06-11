@@ -384,6 +384,7 @@ class Smart extends BaseController
         }
 
         $rankingArray = [];
+        file_put_contents(FCPATH . 'debug.txt', "Active User: " . $id_user . "\nTotal Bobot: " . $totalBobot . "\nNorm Bobot: " . print_r($normBobot, true) . "\nUtility (Nasgor 962 alt_id 10): " . print_r($utility[10] ?? 'no alt 10', true) . "\nNilai Akhir: " . print_r($nilaiAkhir, true), FILE_APPEND);
         foreach ($alternatif as $a) {
             if(isset($nilaiAkhir[$a['id_alternatif']])) {
                 $rankingArray[] = [
@@ -429,23 +430,30 @@ class Smart extends BaseController
     private function getUtilityData($id_user)
     {
         $db = \Config\Database::connect();
-        if ($id_user === 'global') {
-            $rataQuery = $db->table('detail_penilaian')
-                            ->select('penilaian.id_alternatif, detail_penilaian.id_kriteria, AVG(detail_penilaian.nilai) as rata_nilai')
-                            ->join('penilaian', 'penilaian.id_penilaian = detail_penilaian.id_penilaian')
-                            ->groupBy('penilaian.id_alternatif, detail_penilaian.id_kriteria')
-                            ->get()->getResultArray();
-        } else {
-            $rataQuery = $db->table('detail_penilaian')
+        
+        // Selalu ambil nilai rata-rata global sebagai basis (crowd knowledge)
+        $globalQuery = $db->table('detail_penilaian')
+                        ->select('penilaian.id_alternatif, detail_penilaian.id_kriteria, AVG(detail_penilaian.nilai) as rata_nilai')
+                        ->join('penilaian', 'penilaian.id_penilaian = detail_penilaian.id_penilaian')
+                        ->groupBy('penilaian.id_alternatif, detail_penilaian.id_kriteria')
+                        ->get()->getResultArray();
+
+        $matrix = [];
+        foreach ($globalQuery as $r) {
+            $matrix[$r['id_alternatif']][$r['id_kriteria']] = (float) $r['rata_nilai'];
+        }
+
+        // Jika ini adalah ranking personal (id_user spesifik), timpa nilai global dengan nilai personal user tersebut jika ada
+        if ($id_user !== 'global') {
+            $personalQuery = $db->table('detail_penilaian')
                             ->select('penilaian.id_alternatif, detail_penilaian.id_kriteria, detail_penilaian.nilai as rata_nilai')
                             ->join('penilaian', 'penilaian.id_penilaian = detail_penilaian.id_penilaian')
                             ->where('penilaian.id_user', $id_user)
                             ->get()->getResultArray();
-        }
-
-        $matrix = [];
-        foreach ($rataQuery as $r) {
-            $matrix[$r['id_alternatif']][$r['id_kriteria']] = (float) $r['rata_nilai'];
+                            
+            foreach ($personalQuery as $p) {
+                $matrix[$p['id_alternatif']][$p['id_kriteria']] = (float) $p['rata_nilai'];
+            }
         }
 
         $alternatif = $this->alternatifModel->findAll();
@@ -488,6 +496,13 @@ class Smart extends BaseController
                 if ($max - $min != 0) {
                     if ($jenis == 'Benefit') $u = ($val - $min) / ($max - $min);
                     else $u = ($max - $val) / ($max - $min);
+                } else {
+                    // Jika max == min, berikan utility 1 jika alternatif ini memiliki nilai >= max
+                    if ($val > 0 && $val >= $max) {
+                        $u = 1;
+                    } else {
+                        $u = 0;
+                    }
                 }
                 $utility[$id_a][$id_k] = $u;
             }

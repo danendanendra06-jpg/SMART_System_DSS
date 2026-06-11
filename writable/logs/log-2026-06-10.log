@@ -1,0 +1,19 @@
+ERROR - 2026-06-10 15:38:16 --> Unknown column 'bobot' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('UPDATE `kriteria` SET `nama_kriteria` = \'Harga\', `jenis` = \'Cost\', `bobot` = 4
+WHERE `id_kriteria` = 1', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(769): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `kriteria` SET `nama_kriteria` = \'Harga\', `jenis` = \'Cost\', `bobot` = 4
+WHERE `id_kriteria` = 1')
+ 3 SYSTEMPATH\Database\BaseConnection.php(686): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `kriteria` SET `nama_kriteria` = \'Harga\', `jenis` = \'Cost\', `bobot` = 4
+WHERE `id_kriteria` = 1')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2521): CodeIgniter\Database\BaseConnection->query('UPDATE `kriteria` SET `nama_kriteria` = :nama_kriteria:, `jenis` = :jenis:, `bobot` = :bobot:
+WHERE `id_kriteria` = :id_kriteria:', [...], false)
+ 5 APPPATH\Database\Seeds\MainSeeder.php(100): CodeIgniter\Database\BaseBuilder->update([...])
+ 6 APPPATH\Database\Seeds\MainSeeder.php(20): App\Database\Seeds\MainSeeder->seedBobot(Object(CodeIgniter\Database\MySQLi\Connection))
+ 7 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\MainSeeder->run()
+ 8 SYSTEMPATH\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\MainSeeder')
+ 9 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run([])
+10 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', [...])
+11 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+12 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+13 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))

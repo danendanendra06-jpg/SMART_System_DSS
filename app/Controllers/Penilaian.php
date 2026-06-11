@@ -111,10 +111,20 @@ class Penilaian extends BaseController
         
         $id_penilaian = $this->penilaianModel->getInsertID();
 
+        $kriteriaList = $this->kriteriaModel->findAll();
+        $kriteriaMap = [];
+        foreach($kriteriaList as $k) {
+            $kriteriaMap[$k['id_kriteria']] = $k['jenis'];
+        }
+
         $detailData = [];
         if($nilai && is_array($nilai)) {
             foreach($nilai as $id_kriteria => $val) {
                 if($val !== "") {
+                    $jenis = $kriteriaMap[$id_kriteria] ?? 'Benefit';
+                    if ($jenis === 'Cost') {
+                        $val = 6 - $val;
+                    }
                     $detailData[] = [
                         'id_penilaian' => $id_penilaian,
                         'id_kriteria'  => $id_kriteria,
@@ -147,7 +157,7 @@ class Penilaian extends BaseController
         $details = $this->detailPenilaianModel->where('id_penilaian', $id)->findAll();
         $nilaiSelesai = [];
         foreach($details as $d) {
-            $nilaiSelesai[$d['id_kriteria']] = $this->mapSmartToSkala($d['nilai']);
+            $nilaiSelesai[$d['id_kriteria']] = $this->mapSmartToSkala($d['nilai'], $d['id_kriteria']);
         }
 
         $data = [
@@ -192,10 +202,20 @@ class Penilaian extends BaseController
 
         $this->detailPenilaianModel->where('id_penilaian', $id)->delete();
 
+        $kriteriaList = $this->kriteriaModel->findAll();
+        $kriteriaMap = [];
+        foreach($kriteriaList as $k) {
+            $kriteriaMap[$k['id_kriteria']] = $k['jenis'];
+        }
+
         $detailData = [];
         if($nilai && is_array($nilai)) {
             foreach($nilai as $id_kriteria => $val) {
                 if($val !== "") {
+                    $jenis = $kriteriaMap[$id_kriteria] ?? 'Benefit';
+                    if ($jenis === 'Cost') {
+                        $val = 6 - $val;
+                    }
                     $detailData[] = [
                         'id_penilaian' => $id,
                         'id_kriteria'  => $id_kriteria,
@@ -237,7 +257,7 @@ class Penilaian extends BaseController
         return $map[$skala] ?? 0;
     }
 
-    private function mapSmartToSkala($smartValue)
+    private function mapSmartToSkala($smartValue, $id_kriteria = null)
     {
         $map = [
             10 => 1,
@@ -246,6 +266,15 @@ class Penilaian extends BaseController
             80 => 4,
             100 => 5
         ];
-        return $map[$smartValue] ?? '';
+        $skala = $map[$smartValue] ?? '';
+        
+        if ($id_kriteria && $skala !== '') {
+            $kriteria = $this->kriteriaModel->find($id_kriteria);
+            if ($kriteria && $kriteria['jenis'] === 'Cost') {
+                $skala = 6 - $skala;
+            }
+        }
+        
+        return $skala;
     }
 }
